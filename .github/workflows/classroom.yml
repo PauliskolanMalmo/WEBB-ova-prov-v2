@@ -1,0 +1,125 @@
+name: Autograding Tests
+on:
+  - push
+  - workflow_dispatch
+  - repository_dispatch
+
+permissions:
+  checks: write
+  actions: read
+  contents: read
+
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Test HTML header
+      id: html-header
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: HTML header exists
+        command: "grep -q '<header' index.html"
+        timeout: 5
+        max-score: 1
+
+    - name: Test navigation
+      id: nav-test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Navigation exists
+        command: "grep -q '<nav' index.html"
+        timeout: 5
+        max-score: 1
+
+    - name: Test image
+      id: image-test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Image exists
+        command: "grep -q '<img' index.html"
+        timeout: 5
+        max-score: 1
+
+    - name: Test alt attribute
+      id: alt-test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Image alt attribute
+        command: "grep -q 'alt=' index.html"
+        timeout: 5
+        max-score: 1
+
+    - name: Test form
+      id: form-test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Form exists
+        command: "grep -q '<form' index.html"
+        timeout: 5
+        max-score: 1
+
+    - name: Test CSS linked
+      id: css-link
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: CSS linked
+        command: "grep -q 'stylesheet' index.html"
+        timeout: 5
+        max-score: 1
+
+    - name: Test Flexbox
+      id: flexbox-test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Flexbox used
+        command: "grep -q 'display:flex' css/style.css"
+        timeout: 5
+        max-score: 1
+
+    - name: Test Grid
+      id: grid-test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Grid used
+        command: "grep -q 'display:grid' css/style.css"
+        timeout: 5
+        max-score: 1
+
+    - name: Test Media Query
+      id: media-test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: Responsive design
+        command: "grep -q '@media' css/style.css"
+        timeout: 5
+        max-score: 1
+
+    - name: Test JavaScript DOM
+      id: js-test
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: JavaScript getElementById
+        command: "grep -q 'getElementById' js/script.js"
+        timeout: 5
+        max-score: 1
+
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        HTML-HEADER_RESULTS: "${{ steps.html-header.outputs.result }}"
+        NAV-TEST_RESULTS: "${{ steps.nav-test.outputs.result }}"
+        IMAGE-TEST_RESULTS: "${{ steps.image-test.outputs.result }}"
+        ALT-TEST_RESULTS: "${{ steps.alt-test.outputs.result }}"
+        FORM-TEST_RESULTS: "${{ steps.form-test.outputs.result }}"
+        CSS-LINK_RESULTS: "${{ steps.css-link.outputs.result }}"
+        FLEXBOX-TEST_RESULTS: "${{ steps.flexbox-test.outputs.result }}"
+        GRID-TEST_RESULTS: "${{ steps.grid-test.outputs.result }}"
+        MEDIA-TEST_RESULTS: "${{ steps.media-test.outputs.result }}"
+        JS-TEST_RESULTS: "${{ steps.js-test.outputs.result }}"
+      with:
+        runners: html-header,nav-test,image-test,alt-test,form-test,css-link,flexbox-test,grid-test,media-test,js-test
